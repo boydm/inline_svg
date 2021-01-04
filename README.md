@@ -22,25 +22,29 @@
   them in directly. I recommend simply using "assets/svg".
 
   ## Example wrapper module
-      defmodule MyAppWeb.Svg do
+  ```elixir
+  defmodule MyAppWeb.Svg do
 
-        # Build the library at compile time
-        @library InlineSvg.compile( "assets/svg" )
+    # Build the library at compile time
+    @library InlineSvg.compile( "assets/svg" )
 
-        # Accesses the library at run time
-        defp library(), do: @library
+    # Accesses the library at run time
+    defp library(), do: @library
 
-        # Render an svg from the library
-        def render( key, opts \\ [] ) do
-          InlineSvg.render( library(), key, opts )
-        end
-      end
+    # Render an svg from the library
+    def render( key, opts \\ [] ) do
+      InlineSvg.render( library(), key, opts )
+    end
+  end
+  ```
 
   To use the library, you would `alias MyAppWeb.Svg` in a controller, live_view or
   your your main app module. This allows your template code to call Svg.render directly.
 
   ## Example use in a template
-      <%= Svg.render( "heroicons/user", class: "h-5 w-5 inline" ) %>
+  ```elixir
+  <%= Svg.render( "heroicons/user", class: "h-5 w-5 inline" ) %>
+  ```
 
   ### Live reloading
 

@@ -56,25 +56,15 @@ defmodule InlineSvgTest do
     assert String.starts_with?( svg, "<svg class=\"test_class\" @click=\"action\" xmlns=" )
   end
 
+  test "render converts attrs with the _ character into - " do
+    {:safe, svg} = InlineSvg.render( library(), "x", test_attr: "some_data" )
+    assert String.starts_with?( svg, "<svg test-attr=\"some_data\" xmlns=" )
+  end
+
   test "render raises an error if the svg is not in the library" do
     assert_raise InlineSvg.Error, fn ->
       InlineSvg.render( library(), "missing" )
     end
-  end
-
-  #--------------------------------------------------------
-  # render_attrs
-
-  test "render_attrs returns an empty string if opts is empty" do
-    assert InlineSvg.render_attrs([]) == ""
-  end
-
-  test "render_attrs returns an empty string with the rendered attributes" do
-    assert InlineSvg.render_attrs(abc: 123, def: "test attr") == " abc=123 def=\"test attr\""
-  end
-
-  test "render_attrs converts the _ character into - in keys" do
-    assert InlineSvg.render_attrs(abc_def: 123, def: "test_attr") == " abc-def=123 def=\"test_attr\""
   end
 
 end

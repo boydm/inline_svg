@@ -1,9 +1,10 @@
 defmodule InlineSvg do
+  require Logger
+
   @moduledoc """
   Documentation for `InlineSvg`.
   """
 
-  require Logger
 
   defmodule Error do
     @moduledoc false
@@ -12,6 +13,7 @@ defmodule InlineSvg do
 
 
   #--------------------------------------------------------
+  @spec compile(map(), String.t()) :: map()
   def compile( %{} = library \\ %{}, svg_root  ) when is_bitstring(svg_root) do
     svg_root
     |> Kernel.<>( "/**/*.svg" )
@@ -54,8 +56,8 @@ defmodule InlineSvg do
     end
   end
 
-
   #--------------------------------------------------------
+  @spec render(map(), String.t(), keyword()) ::String.t()
   def render( %{} = library, key, attrs \\ [] ) do
     case Map.fetch( library, key ) do
       {:ok, svg} -> {:safe, "<svg" <> render_attrs(attrs) <> svg}
@@ -65,7 +67,7 @@ defmodule InlineSvg do
 
   #--------------------------------------------------------
   # transform an opts list into a string of tag options
-  def render_attrs( attrs ), do: do_render_attrs( attrs, "" )
+  defp render_attrs( attrs ), do: do_render_attrs( attrs, "" )
   defp do_render_attrs( [], acc ), do: acc
   defp do_render_attrs( [{key,value} | tail ], acc ) do
     key = to_string(key) |> String.replace("_", "-")

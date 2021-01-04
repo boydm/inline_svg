@@ -7,32 +7,32 @@ defmodule InlineSvg do
   SVG files are images that are formatted as very simple, and usually small, text
   files. It is faster, and recommended, that you directly include the svg data
   in-line with your web pages instead of asking the browser to make additional
-  calls to servers before it can render your pages.
+  calls to servers before it can render your pages. This makes your pages load faster.
 
-  The static asset systems in web servers such as Phoenix are geared more toward
-  larger files such as images, js and css libraries, where subsequent
-  calls for data makes more sense. In the case of SVG files, in-line data makes sense.
+  `inline_svg` renders your svg files as quickly as possible. To do this, it reads
+  the svg files at compile-time and provides runtime access through a term
+  stored in your beamfile.
 
-  `inline_svg` attempts to access and render your svg files ans simply and quickly as
-  possible. It only reads the files at compile-time and provides very fast access to
-  the data at runtime through a stored map in your beamfile.
-
-  If you use `nimble_publisher`, then this is already a familiar concept.
+  If you use `nimble_publisher`, this should be a familiar concept.
 
   To use `inline_svg`, you create a module in your project that wraps it, providing
   a compile-time place to build the library and runtime access to it. It also happens
   to make your template svg rendering code very simple.
 
-  ## Example
+  You do __not__ need to store your svg files in the "assets/static" directory. Those files
+  are copied into your application via a file based mechanism, whereas `inline_svg` compiles
+  them in directly. I recommend simply using "assets/svg".
+
+  ## Example wrapper module
       defmodule MyAppWeb.Svg do
 
-        # this compiles the library at compile time
-        @library InlineSvg.compile( "svg" )
+        # Build the library at compile time
+        @library InlineSvg.compile( "assets/svg" )
 
-        # this accesses the library at run time
-        def library(), do: @library
+        # Accesses the library at run time
+        defp library(), do: @library
 
-        # render an svg from the library
+        # Render an svg from the library
         def render( key, opts \\ [] ) do
           InlineSvg.render( library(), key, opts )
         end
@@ -41,7 +41,7 @@ defmodule InlineSvg do
   To use the library, you would `alias MyAppWeb.Svg` in a controller, live_view or
   your your main app module. This allows your template code to call Svg.render directly.
 
-  ## Example
+  ## Example use in a template
       <%= Svg.render( "heroicons/user", class: "h-5 w-5 inline" ) %>
 
   ### Live reloading
@@ -53,7 +53,7 @@ defmodule InlineSvg do
   live_reload: [
     patterns: [
       ...,
-      ~r"svgs/*/.*(svg)$"
+      ~r"assets/svg/*/.*(svg)$"
     ]
   ]
   ```
@@ -73,14 +73,10 @@ defmodule InlineSvg do
   The folder and it's subfolders will be traversed and all valid `*.svg` files will
   be added to the library. Each svg will be added to the library with a key that is
   relative path of the svg file, minus the .svg part. For example, if you compile
-  the folder "my_svgs" and it finds a file with the path "my_svgs/heroicons/calendar.svg",
+  the folder "assets/svg" and it finds a file with the path "assets/svg/heroicons/calendar.svg",
   then the key for that svg is `"heroicons/calendar"` in the library.
   
   ## Usage
-
-  Compile is intended to be called at compile time. This prepares your svgs in advance
-  and stores them as an erlang term in your code. For this reason, the svg folder you use
-  does NOT need to be in your Phoenix assets folder.
 
   The best way to use InlineSvg is to create a new module in your project that wraps
   it, providing storage for the generated library term. This also allows you to customize
@@ -89,13 +85,13 @@ defmodule InlineSvg do
   ## Example
       defmodule MyAppWeb.Svg do
 
-        # this compiles the library at compile time
-        @library InlineSvg.compile( "svg" )
+        # Build the library at compile time
+        @library InlineSvg.compile( "assets/svg" )
 
-        # this accesses the library at run time
-        def library(), do: @library
+        # Accesses the library at run time
+        defp library(), do: @library
 
-        # render an svg from the library
+        # Render an svg from the library
         def render( key, opts \\ [] ) do
           InlineSvg.render( library(), key, opts )
         end
@@ -104,13 +100,6 @@ defmodule InlineSvg do
   Note that @library is accessed through a function. The library could become large,
   so you want to wrap it with a function to ensure that it is only stored as a term
   in your beam file once.
-
-  In this case, you would add `alias MyAppWeb.Svg` to a controller, live_view or
-  your your main app module. Then your `*.eex` or `*.leex` templates can use directly
-
-  ## Example
-      <%= Svg.render( "heroicons/user", class: "h-5 w-5 inline" ) %>
-
   """
   @spec compile(map(), String.t()) :: map()
   def compile( %{} = library \\ %{}, svg_root  ) when is_bitstring(svg_root) do
@@ -161,30 +150,27 @@ defmodule InlineSvg do
 
   The named svg must be in the provided library, which should be build using the compile function.
   
-  Optionally pass in a keyword list of attributes to insert into the svg tag. This can be
-  used to add class="something" tag attributes, phoenix directives such as phx-click, or
-  even alpine directives such as @click="some action". Note that key names containing
-  the underscore character "_" will be converted to the hyphen "-" character.
+  _Optional_: pass in a keyword list of attributes to insert into the svg tag. This can be
+  used to add `class="something"` tag attributes, phoenix directives such as `phx-click`, or
+  even alpine directives such as `@click="some action"`. Note that key names containing
+  the underscore character `"_"` will be converted to the hyphen `"-"` character.
 
   ## Examples
   Without attributes:
-      iex> InlineSvg.render( library, "heroicons/menu" )
-      {:safe, "<svg xmlns=\"http://www.w3.org/2000/svg\" ... </svg>"}
+      InlineSvg.render( library, "heroicons/menu" )
+      {:safe, "<svg xmlns= ... </svg>"}
 
   With options:
-      iex> InlineSvg.render( library, "heroicons/menu", class: "h-5 w-5" )
-      {:safe, "<svg class=\"h-5 w-5\" xmlns=\"http://www.w3.org/2000/svg\" ... </svg>"}
+      InlineSvg.render( library, "heroicons/menu", class: "h-5 w-5" )
+      {:safe, "<svg class=\"h-5 w-5\" xmlns= ... </svg>"}
 
-      iex> InlineSvg.render( library, "heroicons/menu", phx_click: "action" )
-      {:safe, "<svg phx-click=\"action\" xmlns=\"http://www.w3.org/2000/svg\" ... </svg>"}
+      InlineSvg.render( library, "heroicons/menu", phx_click: "action" )
+      {:safe, "<svg phx-click=\"action\" xmlns= ... </svg>"}
 
-      iex> InlineSvg.render( library, "heroicons/menu", "@click": "alpine_action" )
-      {:safe, "<svg @click=\"alpine_action\" xmlns=\"http://www.w3.org/2000/svg\" ... </svg>"}
-
-      iex> InlineSvg.render( library, "heroicons/menu", class: "h-5 w-5", phx_click: "action" )
-      {:safe, "<svg class=\"h-5 w-5\" phx-click=\"action\" xmlns= ... </svg>"}
+      InlineSvg.render( library, "heroicons/menu", "@click": "alpine_action" )
+      {:safe, "<svg @click=\"alpine_action\" xmlns= ... </svg>"}
   """
-  @spec render(map(), String.t(), keyword()) ::String.t()
+  @spec render(map(), String.t(), list()) ::String.t()
   def render( %{} = library, key, attrs \\ [] ) do
     case Map.fetch( library, key ) do
       {:ok, svg} -> {:safe, "<svg" <> render_attrs(attrs) <> svg}

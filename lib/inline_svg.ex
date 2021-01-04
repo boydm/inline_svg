@@ -72,7 +72,7 @@ defmodule InlineSvg do
 
   #--------------------------------------------------------
   @doc """
-  Compile a folder full of `*.svg` files into a library you can render from.
+  Compile a folder of `*.svg` files into a library you can render from.
 
   The folder and it's subfolders will be traversed and all valid `*.svg` files will
   be added to the library. Each svg will be added to the library with a key that is

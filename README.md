@@ -21,6 +21,8 @@
   are copied into your application via a file based mechanism, whereas `inline_svg` compiles
   them in directly. I recommend simply using "assets/svg".
 
+  Each *.svg file must contain a single valid `<svg></svg>` tag set with data as appropriate. Anything before the `<svg>` tag or after the `</svg>` is treated as comment and stripped from the text during compilation.
+
   ## Example wrapper module
   ```elixir
   defmodule MyAppWeb.Svg do

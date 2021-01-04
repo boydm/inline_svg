@@ -44,8 +44,9 @@ defmodule InlineSvg.MixProject do
   def docs do
     [
       extras: ["README.md"],
-      source_ref: "v#{@version}"
-      source_url: @url
+      source_ref: "v#{@version}",
+      source_url: @url,
+      main: "readme"
     ]
   end
 end

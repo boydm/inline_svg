@@ -159,19 +159,31 @@ defmodule InlineSvg do
   even alpine directives such as `@click="some action"`. Note that key names containing
   the underscore character `"_"` will be converted to the hyphen `"-"` character.
 
-  ## Examples
+
+  You don't normally call `InlineSvg.render()` directly, except in your wrapper module. Instead,
+  you would `alias MyAppWeb.Svg` in a controller, live view or
+  your your main app module. This allows your template code to call Svg.render directly, which
+  is simple and looks nice.
+
+  The following examples all use an aliased `MyAppWeb.Svg`, which wraps `InlineSvg`.
+
+  ## Example use in a template
+      <%= Svg.render( "heroicons/menu" ) %>
+      <%= Svg.render( "heroicons/user", class: "h-5 w-5 inline" ) %>
+
+  ## Other examples
   Without attributes:
-      InlineSvg.render( library, "heroicons/menu" )
+      Svg.render( "heroicons/menu" )
       {:safe, "<svg xmlns= ... </svg>"}
 
   With options:
-      InlineSvg.render( library, "heroicons/menu", class: "h-5 w-5" )
+      Svg.render( "heroicons/menu", class: "h-5 w-5" )
       {:safe, "<svg class=\"h-5 w-5\" xmlns= ... </svg>"}
 
-      InlineSvg.render( library, "heroicons/menu", phx_click: "action" )
+      Svg.render( "heroicons/menu", phx_click: "action" )
       {:safe, "<svg phx-click=\"action\" xmlns= ... </svg>"}
 
-      InlineSvg.render( library, "heroicons/menu", "@click": "alpine_action" )
+      Svg.render( "heroicons/menu", "@click": "alpine_action" )
       {:safe, "<svg @click=\"alpine_action\" xmlns= ... </svg>"}
   """
   @spec render(map(), String.t(), list()) ::String.t()

@@ -11,7 +11,7 @@ calls to servers before it can render your pages. This makes your pages load fas
 the svg files at compile-time and provides runtime access through a term
 stored in your beamfile.
 
-If you use `nimble_publisher`, this should be a familiar concept.
+If you use [`nimble_publisher`](https://github.com/dashbitco/nimble_publisher), this should be a familiar concept.
 
 To use `inline_svg`, you create a module in your project that wraps it, providing
 a compile-time place to build the library and runtime access to it. It also happens
@@ -45,10 +45,13 @@ end
 To use the library, you would `alias MyAppWeb.Svg` in a controller, live_view or
 your your main app module. This allows your template code to call Svg.render directly.
 
-## Example use in a template
+## Example uses in a template
 
 ```elixir
+<%= Svg.render( "heroicons/menu" ) %>
 <%= Svg.render( "heroicons/user", class: "h-5 w-5 inline" ) %>
+<%= Svg.render( "heroicons/login", class: "h-5 w-5", phx_click: "action" )
+<%= Svg.render( "heroicons/logout", "@click": "alpine_action" )
 ```
 
 ### Live reloading

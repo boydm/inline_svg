@@ -1,4 +1,4 @@
-# inline_svg
+# InlineSvg
 
 Simple and fast in-line SVG library and renderer for web applications.
 

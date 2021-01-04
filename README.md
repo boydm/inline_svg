@@ -21,10 +21,11 @@ You do __not__ need to store your svg files in the "assets/static" directory. Th
 are copied into your application via a file based mechanism, whereas `inline_svg` compiles
 them in directly. I recommend simply using "assets/svg".
 
-Each *.svg file must contain a single valid `<svg></svg>` tag set with data as appropriate. Anything before the `<svg>` tag or after the `</svg>` is treated as comment and stripped from the text during compilation.
+Each `*.svg` file must contain a single valid `<svg></svg>` tag set with data as appropriate. Anything before the `<svg>` tag or after the `</svg>` is treated as comment and stripped from the text during compilation.
 
 
 ## Example wrapper module
+
 ```elixir
 defmodule MyAppWeb.Svg do
 
@@ -45,6 +46,7 @@ To use the library, you would `alias MyAppWeb.Svg` in a controller, live_view or
 your your main app module. This allows your template code to call Svg.render directly.
 
 ## Example use in a template
+
 ```elixir
 <%= Svg.render( "heroicons/user", class: "h-5 w-5 inline" ) %>
 ```
@@ -62,9 +64,6 @@ live_reload: [
   ]
 ]
 ```
-
-
-
 
 
 ## License

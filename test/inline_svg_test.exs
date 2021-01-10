@@ -51,6 +51,11 @@ defmodule InlineSvgTest do
     assert String.starts_with?( svg, "<svg xmlns=" )
   end
 
+  test "render preserves the tailing </svg>" do
+    {:safe, svg} = InlineSvg.render( library(), "x" )
+    assert String.ends_with?( svg, "</svg>" )
+  end
+
   test "render inserts optional attributes" do
     {:safe, svg} = InlineSvg.render( library(), "x", class: "test_class", "@click": "action" )
     assert String.starts_with?( svg, "<svg class=\"test_class\" @click=\"action\" xmlns=" )
